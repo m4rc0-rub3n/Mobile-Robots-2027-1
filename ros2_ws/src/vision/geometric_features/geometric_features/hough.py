@@ -15,7 +15,7 @@ import numpy
 import cv2
 import math
 
-FULL_NAME = "FULL NAME"
+FULL_NAME = "Marco Ruben Guerrero Nieva"
 
 class HoughNode(Node):
     def callback_img(self, msg):
@@ -37,7 +37,28 @@ class HoughNode(Node):
         # and self.hough_threshold
         #
         
+        img_gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
+        img_canny = cv2.Canny(img_gray, self.canny_lower, self.canny_upper)
         
+        t_start = self.get_clock().now()
+        lines = cv2.HoughLines(img_canny, self.rho, self.theta, self.hough_threshold)
+        t_end = self.get_clock().now()
+        delta_ms = (t_end.nanoseconds - t_start.nanoseconds) / 1e6
+
+        if lines is not None:
+            for line in lines:
+                rho, theta = line[0]
+                a = math.cos(theta)
+                b = math.sin(theta)
+                x0 = a * rho
+                y0 = b * rho
+                x1 = int(x0 + 1000 * (-b))
+                y1 = int(y0 + 1000 * (a))
+                x2 = int(x0 - 1000 * (-b))
+                y2 = int(y0 - 1000 * (a))
+                cv2.line(img_hough, (x1, y1), (x2, y2), (0, 0, 255), 2)
+                
+        cv2.putText(img_hough, f"time[ms]={delta_ms:.2f}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), 2)        
         cv2.imshow("BGR Original", img_bgr)
         cv2.imshow("Houhgh", img_hough)
         cv2.waitKey(1)

@@ -14,7 +14,7 @@ from cv_bridge import CvBridge
 import numpy
 import cv2
 
-FULL_NAME = "FULL NAME"
+FULL_NAME = "Marco Ruben Guerrero Nieva"
 
 class CannyNode(Node):
     def callback_img(self, msg):
@@ -27,7 +27,8 @@ class CannyNode(Node):
         # the variables self.canny_lower and self.canny_upper
         # Store the resulting binary image in img_bin
         #
-        
+        img_gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
+        img_bin = cv2.Canny(img_gray, self.canny_lower, self.canny_upper)
         #
         #
         cv2.imshow("BGR Original", img_bgr)
@@ -44,7 +45,7 @@ class CannyNode(Node):
         self.canny_lower = self.get_parameter("canny_l").get_parameter_value().integer_value
         self.canny_upper = self.get_parameter("canny_u").get_parameter_value().integer_value
         print("Starting border detection with parameters: ", [self.canny_lower, self.canny_upper])
-        
+
 
 def main(args=None):
     rclpy.init(args=args)
@@ -55,3 +56,4 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
+
